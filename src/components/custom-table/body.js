@@ -4,41 +4,13 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useTableContext } from ".";
 import FlexBox from "../display-helpers/flex-box"
 import { useInView } from 'react-intersection-observer';
+import { useTableBodyHooks } from "./useBodyHooks";
 
-export default function CustomTableBody({data={}, cb}){
-    const tableContext = useTableContext()
-    const tbodyRef = useRef(null)
-    const {data:tData, renderCount, rowsMax, headers, selected, sortColumn, sortedKeys} = tableContext
-    const jData = JSON.stringify(tData.value) 
-
-    const hasMore = renderCount.value < sortedKeys.value.length
-
-    useEffect(()=>{
-        tableContext.data.setter(data)
-        tableContext.sortedKeys.setter(Object.keys(data))
-    },[])
-
-    const displayData = useMemo(()=>{
-        let keys = sortedKeys.value.slice(0, renderCount.value < rowsMax.value ? renderCount.value : rowsMax.value)
-        let data = tData.value 
-        let dData = keys.map(key => {
-            let obj = {key, id:key, hover: true, selected: selected.value[key], data: {}}
-            headers.value.forEach(h => obj.data[h] = ({
-                align: 'left',
-                value: data[key][h] === undefined ? null : data[key][h],
-                element: null, 
-                padding: 'normal'
-                
-            }))
-            
-            if(cb && typeof cb === "function") obj = cb(obj, data)
-            return obj 
-        })
-        return dData 
-    }, [sortedKeys.value, renderCount.value, rowsMax.value, jData, headers.value, selected.value, sortColumn.value])
+export default function CustomTableBody({data, updateRow}){
+    const {displayData, hasMore} = useTableBodyHooks({data, updateRow})
 
     return (
-        <TableBody sx={{height: "100%", overflow:'auto'}} ref={tbodyRef}>
+        <TableBody sx={{height: "100%", overflow:'auto'}}>
             {displayData.map(obj => <CustomTableRow {...obj}/>)}
             {hasMore && <LoadingMoreRow/>}
         </TableBody>
@@ -69,11 +41,11 @@ export const CustomTableCell = React.memo((props) =>{
     let {align, padding, element, type, value, header, rowId} = props
     
     if(header === "select-all") {
-        
         element = <SelectBox id={rowId}/>
         align="center"
         padding="checkbox"
     }
+
     
     return (
         <TableCell {...{align, padding}}>
@@ -94,7 +66,6 @@ export function SelectBox({id}){
             return {...previous}
         })
     }
-    console.log(id, context.selected.value, isSelected)
     return (
         <Checkbox 
             checked={isSelected}
