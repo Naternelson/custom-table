@@ -1,8 +1,7 @@
 import { Checkbox, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material"
-import {  useCallback, useEffect, useMemo, useState } from "react"
+import {  useCallback, useEffect } from "react"
 import { useTableContext } from "."
 import React from "react"
-import wait from "../function-helpers/wait"
 
 export default function CustomHeader({children, selectBox, selectColor="primary"}){
 
