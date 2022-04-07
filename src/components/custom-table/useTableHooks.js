@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
-export function useTableHooks(props){
+export function useTableHooks({onLoadEnd, ...props}){
     const tableRef = useRef()
     const [data, setData] = useState({})
     const [renderCount, setRenderCount] = useState(props.groupSize || 50)

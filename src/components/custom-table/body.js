@@ -1,10 +1,9 @@
 import { Checkbox, TableBody, TableCell, TableRow, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useRef } from "react";
+import React from "react";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useTableContext } from ".";
 import FlexBox from "../display-helpers/flex-box"
-import { useInView } from 'react-intersection-observer';
-import { useTableBodyHooks } from "./useBodyHooks";
+import { useTableBodyHooks, useTableRowHooks } from "./useBodyHooks";
 
 export default function CustomTableBody({data, updateRow}){
     const {displayData, hasMore} = useTableBodyHooks({data, updateRow})
@@ -18,18 +17,11 @@ export default function CustomTableBody({data, updateRow}){
 }
 
 export function CustomTableRow(props){
-    const {ref, inView} = useInView({initialInView:true})
-    const context = useTableContext()
-    const rowProps = {
-        hover: !!props.hover,
-        selected: !!props.selected,
-        id: `row-${props.id}` 
-    }
-    const cellProps = (header) => ({...props.data[header], key: `${header}-${rowProps.id}`, rowId: props.id, header})
+    const {inView, cellProps, headers, rowProps} = useTableRowHooks(props)
 
     return (
         <TableRow {...rowProps}>
-            { inView && context.headers.value.map(h => (<CustomTableCell {...cellProps(h)}/>))} 
+            { inView && headers.map(h => (<CustomTableCell {...cellProps(h)}/>))} 
             {!inView && <TableCell padding="normal" colSpan= '100%' align="center" >{`Retrieving...`}</TableCell>}
         </TableRow>
     )
@@ -38,7 +30,7 @@ export function CustomTableRow(props){
 
 
 export const CustomTableCell = React.memo((props) =>{
-    let {align, padding, element, type, value, header, rowId} = props
+    let {align, padding, element, value, header, rowId} = props
     
     if(header === "select-all") {
         element = <SelectBox id={rowId}/>
@@ -46,7 +38,6 @@ export const CustomTableCell = React.memo((props) =>{
         padding="checkbox"
     }
 
-    
     return (
         <TableCell {...{align, padding}}>
             {!!element && element}

@@ -1,10 +1,10 @@
-import { Box, Checkbox, Tooltip } from "@mui/material";
+import { Checkbox, Tooltip } from "@mui/material";
 import { useMemo } from "react";
 import CustomTable from ".";
 import CustomTableBody from "./body";
 import CustomHeader, { HeaderCell } from "./header";
 
-export function ExampleTable(){
+export default function ExampleTable(){
     const count = 2000
     const seedMembers = useMemo(()=>{
         return createSeedMembers(count)
